@@ -21,19 +21,19 @@ RUN apk add --no-cache \
     g++ \
     make \
     cmake \
-	geoip-dev \
-	libmemcached-dev \
-	cyrus-sasl-dev \
-	pcre-dev \
-	git \
-	file \
-	freetype-dev \
-	libjpeg-turbo-dev \
-	re2c
+    geoip-dev \
+    libmemcached-dev \
+    cyrus-sasl-dev \
+    pcre-dev \
+    git \
+    file \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    re2c
 
 RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main \
-	libressl-dev \
-	rabbitmq-c-dev
+    libressl-dev \
+    rabbitmq-c-dev
 
 # =================== #
 # PHP CORE EXTENSIONS #
@@ -71,19 +71,19 @@ RUN docker-php-ext-enable opcache
 RUN pecl channel-update pecl.php.net
 
 RUN pecl install \
-	amqp \
-	apcu \
-	geoip-beta \
-	msgpack \
-	xdebug \
-	igbinary
+    amqp \
+    apcu \
+    geoip-beta \
+    msgpack \
+    xdebug \
+    igbinary
 
 RUN docker-php-ext-enable \
-	amqp \
-	apcu \
-	geoip \
-	msgpack \
-	igbinary
+    amqp \
+    apcu \
+    geoip \
+    msgpack \
+    igbinary
 
 # ================= #
 # CUSTOM EXTENSIONS #
@@ -109,11 +109,11 @@ RUN git clone --branch php7 --single-branch --depth 1 https://github.com/serggp/
 RUN cd protobuf && phpize && ./configure && make -j$(getconf _NPROCESSORS_ONLN) && make install
 
 RUN docker-php-ext-enable \
-	blitz \
-	handlersocketi \
-	pinba \
-	protobuf \
-	memcached
+    blitz \
+    handlersocketi \
+    pinba \
+    protobuf \
+    memcached
 
 
 
@@ -131,7 +131,7 @@ WORKDIR /srv/app/hsselite/live
 
 RUN rm -rfv /var/www/html && \
     apk add --no-cache libmcrypt libbz2 libpng libxslt gettext openssl geoip libmemcached cyrus-sasl freetype libjpeg-turbo python postgresql && \
-	apk add rabbitmq-c --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main && \
+    apk add rabbitmq-c --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main && \
     addgroup -g 5555 srv && adduser -G srv -u 5555 -D -h /srv srv && \
     mkdir -v -m 755 /var/run/php-fpm && chown -c srv:srv /var/run/php-fpm && \
     chown -c srv:srv /srv && \
