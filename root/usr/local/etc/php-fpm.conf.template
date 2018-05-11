@@ -1,0 +1,7 @@
+[global]
+pid       = /var/run/php-fpm/php-fpm.pid
+error_log = ${FPM_ERROR_LOG_LOCATION}
+log_level = ${FPM_ERROR_LOG_LEVEL}
+daemonize = no
+
+include=${POOLS_CONFIGURATION}

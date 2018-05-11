@@ -1,0 +1,8 @@
+*
+!.gitignore
+!docker-php-ext-apcu.ini
+!docker-php-ext-blitz.ini
+!docker-php-ext-memcached.ini
+!docker-php-ext-opcache.ini
+!docker-php-ext-pinba.ini
+!docker-php-ext-soap.ini
