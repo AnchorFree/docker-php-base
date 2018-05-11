@@ -2,8 +2,6 @@
 # FIRST STEP - BUILDING PHP EXTENSIONS        #
 # =========================================== #
 
-FROM php:7.1-fpm-alpine
-FROM anchorfree/elite-sources:master AS source-code
 FROM php:7.1-fpm-alpine AS build-env
 
 # PREPARE
@@ -167,9 +165,6 @@ COPY --from=build-env /usr/local/lib/php/extensions/* /usr/local/etc/php/extensi
 COPY --from=build-env /usr/local/etc/php/conf.d/* /artifacts/usr/local/etc/php/conf.d/
 RUN find /usr/local/lib/php/extensions/ -name *.so | xargs -I@ sh -c 'ln -s @ /usr/local/lib/php/extensions/`basename @`'
 RUN cp -r /artifacts/usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
-
-COPY --from=source-code /tmp/artifacts/build/ /srv/app/hsselite/live/
-RUN chown -R srv:srv  /srv/app/hsselite/live/
 RUN rm -rfv /usr/local/etc/php-fpm.d/*
 
 RUN apk --update-cache add python py-requests gzip
