@@ -1,0 +1,7 @@
+version: '3'
+services:
+  php-fpm:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: anchorfree/php-base:latest

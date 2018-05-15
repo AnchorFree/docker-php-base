@@ -1,12 +1,6 @@
-VAGRANT
-=======
-
-Backup solution for build images.
+DOCKER COMPOSE
+==============
 
 ```
-vagrant up
-vagrant ssh
-cd /vagrant/
-sudo docker login
-sudo docker build --pull --rm --file Dockerfile --tag anchorfree/php-elite .
+docker-compose build --force-rm --no-cache --pull
 ```
