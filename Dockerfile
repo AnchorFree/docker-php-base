@@ -143,9 +143,7 @@ WORKDIR /srv/app/hsselite/live
 
 RUN rm -rfv /var/www/html && \
     apk add libmcrypt libbz2 libpng libxslt gettext openssl geoip libmemcached cyrus-sasl freetype libjpeg-turbo python postgresql rabbitmq-c@edge-main && \
-    addgroup -g 5555 srv && adduser -G srv -u 5555 -D -h /srv srv && \
-    mkdir -v -m 755 /var/run/php-fpm && chown -c srv:srv /var/run/php-fpm && \
-    chown -c srv:srv /srv && \
+    mkdir -v -m 755 /var/run/php-fpm && \
     chmod 777 /var/log
 
 # php -d error_reporting=22527 -d display_errors=1 -r 'var_dump(iconv("UTF-8", "UTF-8//IGNORE", "This is the Euro symbol '\''€'\''."));'
