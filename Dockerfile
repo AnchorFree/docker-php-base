@@ -7,9 +7,17 @@ FROM php:7.1-fpm-alpine AS build-env
 # PREPARE
 RUN docker-php-source extract
 
-RUN apk add --no-cache \
+# CONFIGURE APK
+# https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
+RUN echo '@edge-main http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repositories
+RUN echo '@edge-community http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
+RUN echo '@edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
+RUN apk update
+RUN apk add --upgrade apk-tools@edge-main
+
+RUN apk add \
     coreutils \
-    postgresql-dev \
+    postgresql-dev@edge-main \
     libmcrypt-dev \
     bzip2-dev \
     libpng-dev \
@@ -27,11 +35,9 @@ RUN apk add --no-cache \
     file \
     freetype-dev \
     libjpeg-turbo-dev \
-    re2c
-
-RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main \
-    libressl-dev \
-    rabbitmq-c-dev
+    re2c \
+    libressl-dev@edge-main \
+    rabbitmq-c-dev@edge-main
 
 # =================== #
 # PHP CORE EXTENSIONS #
@@ -121,6 +127,14 @@ RUN docker-php-ext-enable \
 
 FROM php:7.1-fpm-alpine
 
+# CONFIGURE APK
+# https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
+RUN echo '@edge-main http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repositories
+RUN echo '@edge-community http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
+RUN echo '@edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
+RUN apk update
+RUN apk add --upgrade apk-tools@edge-main
+
 LABEL maintainer "Aleksandr Ilin <ailyin@anchorfree.com>"
 
 EXPOSE 9000 9001 9002
@@ -128,8 +142,7 @@ EXPOSE 9000 9001 9002
 WORKDIR /srv/app/hsselite/live
 
 RUN rm -rfv /var/www/html && \
-    apk add --no-cache libmcrypt libbz2 libpng libxslt gettext openssl geoip libmemcached cyrus-sasl freetype libjpeg-turbo python postgresql && \
-    apk add rabbitmq-c --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/main && \
+    apk add libmcrypt libbz2 libpng libxslt gettext openssl geoip libmemcached cyrus-sasl freetype libjpeg-turbo python postgresql rabbitmq-c@edge-main && \
     addgroup -g 5555 srv && adduser -G srv -u 5555 -D -h /srv srv && \
     mkdir -v -m 755 /var/run/php-fpm && chown -c srv:srv /var/run/php-fpm && \
     chown -c srv:srv /srv && \
@@ -137,11 +150,11 @@ RUN rm -rfv /var/www/html && \
 
 # php -d error_reporting=22527 -d display_errors=1 -r 'var_dump(iconv("UTF-8", "UTF-8//IGNORE", "This is the Euro symbol '\''€'\''."));'
 # Notice: iconv(): Wrong charset, conversion from `UTF-8' to `UTF-8//IGNORE' is not allowed in Command line code on line 1
-RUN apk add --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/testing gnu-libiconv
+RUN apk add gnu-libiconv@edge-testing
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
 
 # INSTALL DEV RELATED SYSTEM TOOLS
-RUN apk add --no-cache bash grep git openssh-client rsync
+RUN apk add bash grep git openssh-client rsync
 
 ENV HSSELITE_ERROR_LOG /srv/log/php/php_errors.json
 ENV POOLS_CONFIGURATION=/usr/local/etc/php-fpm.d/backend.conf
