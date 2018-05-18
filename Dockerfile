@@ -139,8 +139,6 @@ LABEL maintainer "Aleksandr Ilin <ailyin@anchorfree.com>"
 
 EXPOSE 9000 9001 9002
 
-WORKDIR /srv/app/hsselite/live
-
 RUN rm -rfv /var/www/html && \
     apk add libmcrypt libbz2 libpng libxslt gettext openssl geoip libmemcached cyrus-sasl freetype libjpeg-turbo python postgresql rabbitmq-c@edge-main && \
     mkdir -v -m 755 /var/run/php-fpm && \
@@ -154,24 +152,6 @@ ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
 # INSTALL DEV RELATED SYSTEM TOOLS
 RUN apk add bash grep git openssh-client rsync
 
-ENV HSSELITE_ERROR_LOG /srv/log/php/php_errors.json
-ENV POOLS_CONFIGURATION=/usr/local/etc/php-fpm.d/backend.conf
-ENV PHP_ERROR_LOG_LOCATION  /var/log/php-error.log
-ENV FPM_ERROR_LOG_LOCATION /var/log/fpm-error.log
-ENV FPM_ERROR_LOG_LEVEL error
-ENV FPM_SLOW_LOG_LOCATION /var/log/slow.log
-ENV FPM_ACCESS_LOG_LOCATION /var/log/app-access.json
-ENV PHP_INI_MEMORY_LIMIT 128M
-
-ENV FPM_ANDROID_PM_MAX_CHILDREN 120
-ENV FPM_ANDROID_PM_MAX_REQUESTS 300
-ENV FPM_IOS_PM_MAX_CHILDREN 350
-ENV FPM_IOS_PM_MAX_REQUESTS 1000
-ENV FPM_WWW_PM_MAX_CHILDREN 240
-ENV FPM_WWW_PM_MAX_REQUESTS 300
-ENV FPM_AUTHORIZER_PM_MAX_CHILDREN 100
-ENV FPM_AUTHORIZER_PM_MAX_REQUESTS 300
-
 COPY --from=build-env /usr/local/lib/php/extensions/* /usr/local/etc/php/extensions/
 COPY --from=build-env /usr/local/etc/php/conf.d/* /artifacts/usr/local/etc/php/conf.d/
 RUN find /usr/local/lib/php/extensions/ -name *.so | xargs -I@ sh -c 'ln -s @ /usr/local/lib/php/extensions/`basename @`'
@@ -179,5 +159,3 @@ RUN cp -r /artifacts/usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
 RUN rm -rfv /usr/local/etc/php-fpm.d/*
 
 RUN apk --update-cache add python py-requests gzip
-
-ADD root /
