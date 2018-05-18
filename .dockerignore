@@ -1,0 +1,5 @@
+.gitignore
+.idea
+Jenkinsfile
+Dockerfile
+docker-compose.yml
