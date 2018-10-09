@@ -2,7 +2,7 @@
 # FIRST STEP - BUILDING PHP EXTENSIONS        #
 # =========================================== #
 
-FROM php:7.1-fpm-alpine AS build-env
+FROM php:7.1.21-fpm-alpine AS build-env
 
 # PREPARE
 RUN docker-php-source extract
@@ -125,7 +125,7 @@ RUN docker-php-ext-enable \
 # SECOND STEP - BUILDING PHP CONTAINER ITSELF #
 # =========================================== #
 
-FROM php:7.1-fpm-alpine
+FROM php:7.1.21-fpm-alpine
 
 # CONFIGURE APK
 # https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
