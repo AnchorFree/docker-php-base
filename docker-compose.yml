@@ -4,4 +4,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: anchorfree/php-base:latest
+    image: anchorfree/php-base:master
