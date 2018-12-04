@@ -2,7 +2,7 @@
 # FIRST STEP - BUILDING PHP EXTENSIONS        #
 # =========================================== #
 
-FROM php:7.1.22-fpm-alpine AS build-env
+FROM php:7.2.11-fpm-alpine AS build-env
 
 # PREPARE
 RUN docker-php-source extract
@@ -47,7 +47,6 @@ RUN docker-php-ext-configure \
     gd --with-freetype-dir=/usr/lib --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib
 
 RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
-    mcrypt \
     mysqli \
     bz2 \
     opcache \
@@ -75,6 +74,7 @@ RUN docker-php-ext-enable opcache
 RUN pecl channel-update pecl.php.net
 
 RUN pecl install \
+    mcrypt \
     amqp \
     apcu \
     geoip-beta \
@@ -125,7 +125,7 @@ RUN docker-php-ext-enable \
 # SECOND STEP - BUILDING PHP CONTAINER ITSELF #
 # =========================================== #
 
-FROM php:7.1.22-fpm-alpine
+FROM php:7.2.11-fpm-alpine
 
 # CONFIGURE APK
 # https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
