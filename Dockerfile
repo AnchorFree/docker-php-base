@@ -2,22 +2,18 @@
 # FIRST STEP - BUILDING PHP EXTENSIONS        #
 # =========================================== #
 
-FROM php:7.2.11-fpm-alpine AS build-env
+FROM php:7.2.22-fpm-alpine3.10 AS build-env
 
 # PREPARE
 RUN docker-php-source extract
 
-# CONFIGURE APK
-# https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
-RUN echo '@edge-main http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repositories
-RUN echo '@edge-community http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
-RUN echo '@edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
+# UPDATE APK
 RUN apk update
-RUN apk add --upgrade apk-tools@edge-main
+RUN apk add --upgrade apk-tools
 
 RUN apk add \
     coreutils \
-    postgresql-dev@edge-main \
+    postgresql-dev \
     libmcrypt-dev \
     bzip2-dev \
     libpng-dev \
@@ -36,8 +32,8 @@ RUN apk add \
     freetype-dev \
     libjpeg-turbo-dev \
     re2c \
-    libressl-dev@edge-main \
-    rabbitmq-c-dev@edge-main
+    libressl-dev \
+    rabbitmq-c-dev
 
 # =================== #
 # PHP CORE EXTENSIONS #
@@ -63,7 +59,8 @@ RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
     pdo_mysql \
     pdo_pgsql \
     pgsql \
-    wddx
+    wddx \
+    zip
 
 RUN docker-php-ext-enable opcache
 
@@ -125,28 +122,38 @@ RUN docker-php-ext-enable \
 # SECOND STEP - BUILDING PHP CONTAINER ITSELF #
 # =========================================== #
 
-FROM php:7.2.11-fpm-alpine
+FROM php:7.2.22-fpm-alpine3.10
 
-# CONFIGURE APK
-# https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
-RUN echo '@edge-main http://dl-cdn.alpinelinux.org/alpine/edge/main' >> /etc/apk/repositories
-RUN echo '@edge-community http://dl-cdn.alpinelinux.org/alpine/edge/community' >> /etc/apk/repositories
-RUN echo '@edge-testing http://dl-cdn.alpinelinux.org/alpine/edge/testing' >> /etc/apk/repositories
+# UPDATE APK
 RUN apk update
-RUN apk add --upgrade apk-tools@edge-main
+RUN apk add --upgrade apk-tools
 
 LABEL maintainer "Aleksandr Ilin <ailyin@anchorfree.com>"
 
 EXPOSE 9000 9001 9002
 
-RUN rm -rfv /var/www/html && \
-    apk add libmcrypt libbz2 libpng libxslt gettext openssl geoip libmemcached cyrus-sasl freetype libjpeg-turbo python postgresql rabbitmq-c@edge-main && \
-    mkdir -v -m 755 /var/run/php-fpm && \
-    chmod 777 /var/log
+RUN rm -rfv /var/www/html \
+ && apk add \
+      libmcrypt \
+      libbz2 \
+      libpng \
+      libxslt \
+      gettext \
+      openssl \
+      geoip \
+      libmemcached \
+      cyrus-sasl \
+      freetype \
+      libjpeg-turbo \
+      python \
+      postgresql \
+      rabbitmq-c \
+ && mkdir -v -m 755 /var/run/php-fpm \
+ && chmod 777 /var/log
 
 # php -d error_reporting=22527 -d display_errors=1 -r 'var_dump(iconv("UTF-8", "UTF-8//IGNORE", "This is the Euro symbol '\''€'\''."));'
 # Notice: iconv(): Wrong charset, conversion from `UTF-8' to `UTF-8//IGNORE' is not allowed in Command line code on line 1
-RUN apk add gnu-libiconv@edge-testing
+RUN apk add gnu-libiconv
 ENV LD_PRELOAD /usr/lib/preloadable_libiconv.so php
 
 # INSTALL DEV RELATED SYSTEM TOOLS
