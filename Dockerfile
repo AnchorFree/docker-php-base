@@ -10,7 +10,6 @@ RUN docker-php-source extract
 # UPDATE APK
 RUN apk update
 RUN apk add --upgrade apk-tools
-
 RUN apk add \
     coreutils \
     postgresql-dev \
@@ -90,33 +89,65 @@ RUN docker-php-ext-enable \
 # CUSTOM EXTENSIONS #
 # ================= #
 
-RUN git clone --branch php7 --single-branch --depth 1 https://github.com/php-memcached-dev/php-memcached
-RUN cd php-memcached && phpize && ./configure --enable-memcached-igbinary && make -j$(getconf _NPROCESSORS_ONLN) && make install
+# php-memcached
+RUN git clone --branch php7 --single-branch https://github.com/php-memcached-dev/php-memcached php-memcached \
+ && cd php-memcached \
+ && git checkout e65be324557eda7167c4831b4bfb1ad23a152beb \
+ && git reset --hard
+RUN cd php-memcached \
+ && phpize \
+ && ./configure --enable-memcached-igbinary \
+ && make -j$(getconf _NPROCESSORS_ONLN) \
+ && make install
 
 # blitz
-RUN git clone --branch php7 --single-branch --depth 1 https://github.com/alexeyrybak/blitz.git blitz
-RUN cd blitz && phpize && ./configure && make -j$(getconf _NPROCESSORS_ONLN) && make install
+RUN git clone --branch php7 --single-branch https://github.com/alexeyrybak/blitz.git blitz \
+ && cd blitz \
+ && git checkout 2353a6b0c35418415c76d3659456f40032e90690 \
+ && git reset --hard
+RUN cd blitz \
+ && phpize \
+ && ./configure \
+ && make -j$(getconf _NPROCESSORS_ONLN) \
+ && make install
 
 # handlersocketi
-RUN git clone --branch badoo-7.0 --single-branch --depth 1 https://github.com/tony2001/php-ext-handlersocketi.git handlersocketi
-RUN cd handlersocketi && phpize && ./configure  && make -j$(getconf _NPROCESSORS_ONLN)  && make install
+RUN git clone --branch badoo-7.0 --single-branch https://github.com/tony2001/php-ext-handlersocketi.git handlersocketi \
+ && cd handlersocketi \
+ && git reset --hard 467fa24ec91c02435e059d60175d9ea20a985a5b
+RUN cd handlersocketi \
+ && phpize \
+ && ./configure \
+ && make -j$(getconf _NPROCESSORS_ONLN) \
+ && make install
 
 # pinba
-RUN git clone --branch master --single-branch --depth 1 https://github.com/tony2001/pinba_extension.git pinba
-RUN cd pinba && phpize && ./configure && make -j$(getconf _NPROCESSORS_ONLN) && make install
+RUN git clone --branch master --single-branch https://github.com/tony2001/pinba_extension.git pinba \
+ && cd pinba \
+ && git reset --hard edbc313f1b4fb8407bf7d5acf63fbb0359c7fb2e
+RUN cd pinba \
+ && phpize \
+ && ./configure \
+ && make -j$(getconf _NPROCESSORS_ONLN) \
+ && make install
 
 # protobuf
-RUN git clone --branch php7 --single-branch --depth 1 https://github.com/serggp/php-protobuf protobuf
-RUN cd protobuf && phpize && ./configure && make -j$(getconf _NPROCESSORS_ONLN) && make install
+RUN git clone --branch php7 --single-branch --depth 1 https://github.com/serggp/php-protobuf protobuf \
+ && cd protobuf \
+ && git reset --hard c969785f89ada150941f9ddce20dacf4b95d0f7f
+RUN cd protobuf \
+ && phpize \
+ && ./configure \
+ && make -j$(getconf _NPROCESSORS_ONLN) \
+ && make install
 
+# enable custom extentions
 RUN docker-php-ext-enable \
     blitz \
     handlersocketi \
     pinba \
     protobuf \
     memcached
-
-
 
 # =========================================== #
 # SECOND STEP - BUILDING PHP CONTAINER ITSELF #
