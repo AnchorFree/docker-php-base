@@ -7,6 +7,13 @@ FROM php:7.2.11-fpm-alpine3.8 AS build-env
 # PREPARE
 RUN docker-php-source extract
 
+# CONFIGURE APK
+# https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
+RUN apk update \
+ && apk upgrade \
+ && apk add --upgrade apk-tools
+
+RUN apk add \
     autoconf \
     bzip2-dev \
     cmake \
@@ -141,9 +148,9 @@ RUN cd protobuf \
 RUN docker-php-ext-enable \
     blitz \
     handlersocketi \
+    memcached \
     pinba \
-    protobuf \
-    memcached
+    protobuf
 
 # =========================================== #
 # SECOND STEP - BUILDING PHP CONTAINER ITSELF #
