@@ -209,3 +209,5 @@ RUN cp -r /artifacts/usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
 RUN rm -rfv /usr/local/etc/php-fpm.d/*
 
 RUN apk --update-cache add python py-requests gzip
+RUN sed -e 's/countryName_default/#countryName_default/' -e 's/stateOrProvinceName_default/#stateOrProvinceName_default/' \
+    -e 's/0.organizationName_default/#0.organizationName_default/' -i /etc/ssl/openssl.cnf
