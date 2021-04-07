@@ -81,14 +81,16 @@ RUN pecl install \
     memcached \
     msgpack \
     xdebug \
-    igbinary
+    igbinary \
+    redis
 
 RUN docker-php-ext-enable \
     amqp \
     apcu \
     geoip \
     msgpack \
-    igbinary
+    igbinary \
+    redis
 
 # ================= #
 # CUSTOM EXTENSIONS #
