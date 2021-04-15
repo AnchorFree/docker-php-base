@@ -78,17 +78,23 @@ RUN pecl install \
     amqp \
     apcu \
     geoip-beta \
-    memcached \
     msgpack \
     xdebug \
     igbinary \
-    redis
+    redis && \
+    pecl install --nobuild memcached && \
+        cd "$(pecl config-get temp_dir)/memcached" && \
+        phpize && \
+        ./configure --enable-memcached-igbinary && \
+        make -j$(getconf _NPROCESSORS_ONLN) && \
+        make install
 
 RUN docker-php-ext-enable \
     amqp \
     apcu \
     geoip \
     msgpack \
+    memcached \
     igbinary \
     redis
 
