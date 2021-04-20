@@ -2,8 +2,7 @@
 # FIRST STEP - BUILDING PHP EXTENSIONS        #
 # =========================================== #
 
-# 7.2.27-fpm-alpine3.10 has been choosen as a hotfix
-FROM php:7.2.11-fpm-alpine3.8 AS build-env
+FROM php:7.4.15-fpm-alpine3.13 AS build-env
 
 # PREPARE
 RUN docker-php-source extract
@@ -17,6 +16,7 @@ RUN apk update \
 RUN apk add \
     autoconf \
     bzip2-dev \
+    libzip-dev \
     cmake \
     coreutils \
     cyrus-sasl-dev \
@@ -42,8 +42,9 @@ RUN apk add \
 # PHP CORE EXTENSIONS #
 # =================== #
 
+# https://github.com/docker-library/php/issues/912#issuecomment-559918036
 RUN docker-php-ext-configure \
-    gd --with-freetype-dir=/usr/lib --with-jpeg-dir=/usr/lib --with-png-dir=/usr/lib
+    gd --with-freetype=/usr/lib --with-jpeg=/usr/lib
 
 RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
     bz2 \
@@ -61,7 +62,6 @@ RUN docker-php-ext-install -j$(getconf _NPROCESSORS_ONLN) \
     sysvmsg \
     sysvsem \
     sysvshm \
-    wddx \
     xsl \
     zip
 
@@ -81,30 +81,26 @@ RUN pecl install \
     msgpack \
     xdebug \
     igbinary \
-    redis
+    redis && \
+    pecl install --nobuild memcached && \
+        cd "$(pecl config-get temp_dir)/memcached" && \
+        phpize && \
+        ./configure --enable-memcached-igbinary && \
+        make -j$(getconf _NPROCESSORS_ONLN) && \
+        make install
 
 RUN docker-php-ext-enable \
     amqp \
     apcu \
     geoip \
     msgpack \
+    memcached \
     igbinary \
     redis
 
 # ================= #
 # CUSTOM EXTENSIONS #
 # ================= #
-
-# php-memcached
-RUN git clone --branch php7 --single-branch https://github.com/php-memcached-dev/php-memcached php-memcached \
- && cd php-memcached \
- && git checkout e65be324557eda7167c4831b4bfb1ad23a152beb \
- && git reset --hard
-RUN cd php-memcached \
- && phpize \
- && ./configure --enable-memcached-igbinary \
- && make -j$(getconf _NPROCESSORS_ONLN) \
- && make install
 
 # blitz
 RUN git clone --branch php7 --single-branch https://github.com/alexeyrybak/blitz.git blitz \
@@ -159,7 +155,7 @@ RUN docker-php-ext-enable \
 # SECOND STEP - BUILDING PHP CONTAINER ITSELF #
 # =========================================== #
 
-FROM php:7.2.11-fpm-alpine3.8
+FROM php:7.4.15-fpm-alpine3.13
 
 # CONFIGURE APK
 # https://wiki.alpinelinux.org/wiki/Alpine_Linux_package_management#Repository_pinning
@@ -168,12 +164,12 @@ RUN apk update \
  && apk upgrade \
  && apk add --upgrade apk-tools
 
-LABEL maintainer "Aleksandr Ilin <ailyin@anchorfree.com>"
+LABEL maintainer="Aleksandr Ilin <ailyin@anchorfree.com>"
 
 EXPOSE 9000 9001 9002
 
 RUN rm -rfv /var/www/html \
- && apk add \
+ && apk --update-cache add \
       cyrus-sasl \
       freetype \
       geoip \
@@ -186,7 +182,9 @@ RUN rm -rfv /var/www/html \
       libxslt \
       openssl \
       postgresql \
-      python \
+      python2 \
+      py-requests \
+      gzip \
       rabbitmq-c \
  && mkdir -v -m 755 /var/run/php-fpm \
  && chmod 777 /var/log
@@ -210,6 +208,5 @@ RUN find /usr/local/lib/php/extensions/ -name *.so | xargs -I@ sh -c 'ln -s @ /u
 RUN cp -r /artifacts/usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
 RUN rm -rfv /usr/local/etc/php-fpm.d/*
 
-RUN apk --update-cache add python py-requests gzip
 RUN sed -e 's/countryName_default/#countryName_default/' -e 's/stateOrProvinceName_default/#stateOrProvinceName_default/' \
     -e 's/0.organizationName_default/#0.organizationName_default/' -i /etc/ssl/openssl.cnf
