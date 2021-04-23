@@ -17,6 +17,7 @@ RUN apk add \
     autoconf \
     bzip2-dev \
     libzip-dev \
+    zip \
     cmake \
     coreutils \
     cyrus-sasl-dev \
