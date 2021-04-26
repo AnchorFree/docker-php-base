@@ -181,6 +181,7 @@ RUN rm -rfv /var/www/html \
       libmemcached \
       libpng \
       libxslt \
+      libzip \
       openssl \
       postgresql \
       python2 \
