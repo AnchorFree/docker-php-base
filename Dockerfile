@@ -13,10 +13,11 @@ RUN apk update \
  && apk upgrade \
  && apk add --upgrade apk-tools
 
-RUN apk add \
+RUN apk --no-cache add \
     autoconf \
     bzip2-dev \
     libzip-dev \
+    zip \
     cmake \
     coreutils \
     cyrus-sasl-dev \
@@ -180,6 +181,7 @@ RUN rm -rfv /var/www/html \
       libmemcached \
       libpng \
       libxslt \
+      libzip \
       openssl \
       postgresql \
       python2 \
