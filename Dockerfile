@@ -210,5 +210,8 @@ RUN find /usr/local/lib/php/extensions/ -name *.so | xargs -I@ sh -c 'ln -s @ /u
 RUN cp -r /artifacts/usr/local/etc/php/conf.d/* /usr/local/etc/php/conf.d/
 RUN rm -rfv /usr/local/etc/php-fpm.d/*
 
+RUN curl -o /usr/local/bin/composer https://getcomposer.org/download/latest-1.x/composer.phar \
+    && chmod +x /usr/local/bin/composer
+
 RUN sed -e 's/countryName_default/#countryName_default/' -e 's/stateOrProvinceName_default/#stateOrProvinceName_default/' \
     -e 's/0.organizationName_default/#0.organizationName_default/' -i /etc/ssl/openssl.cnf
