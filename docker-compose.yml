@@ -4,4 +4,4 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: anchorfree/php-base:master
+    image: us-docker.pkg.dev/aura-networking/docker-registry/php-base:master
